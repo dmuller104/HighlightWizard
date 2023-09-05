@@ -1,0 +1,17 @@
+{
+    "manifest_version":3,
+    "name":"HighlightWizard",
+    "description":"Use OpenAI while surfing the web",
+    "version":"1.0",
+    "background":{
+        "service_worker":"background.js",
+        "type":"module"
+    },
+    "permissions": [
+        "contextMenus", "storage"
+    ],
+    "options_page":"options/options.html",
+    "icons": {
+        "16": "icon-bitty.png"
+    }
+}

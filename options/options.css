@@ -1,0 +1,46 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+#add-option {
+  margin-bottom: 20px;
+}
+
+.option_item {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.option_label {
+  font-weight: bold;
+  margin-right: 5px;
+  width: 100px;
+}
+
+.option_data {
+  height: 60px;
+  width: 200px;
+  resize: none;
+}
+
+
+.delete_button {
+  margin-left: 10px;
+}
+
+/* Placeholder text */
+.option_label:empty:before {
+  content: "Option Label";
+  color: #aaa;
+}
+
+.option_data:empty:before {
+  content: "Option Data";
+  color: #aaa;
+}
