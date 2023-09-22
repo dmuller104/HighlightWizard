@@ -8,7 +8,7 @@
         "type":"module"
     },
     "permissions": [
-        "contextMenus", "storage"
+        "contextMenus", "storage", "tabs"
     ],
     "options_page":"options/options.html",
     "icons": {

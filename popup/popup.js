@@ -1,4 +1,23 @@
-API_KEY = '';
+var API_KEY
+async function get_key() {
+    let key = await new Promise((resolve) => {
+        chrome.storage.sync.get("API_KEY", (stuff) => {
+            resolve(stuff.API_KEY);
+        });
+    });
+    if (key == '' || !key) {
+        console.log("Key not set");
+        key = prompt("OpenAI API key not found, please input API key:");
+        chrome.storage.sync.set({ "API_KEY": key });
+    }
+    return key
+}
+
+
+// API_KEY = get_key();
+(async () => {
+    API_KEY = await get_key();
+})();
 // MODEL = "text-babbage-001";
 // MODEL = "text-ada-001";
 MODEL = 'text-davinci-003';
@@ -68,6 +87,9 @@ function get_api_chat(messages) {
             'temperature': 0.5
         })
     }).then(response => {
+        if (response.status == 401) {
+            console.log("Failed OpenAI API authorization, to change API_KEY go to HighlightWizard's chrome options (chrome extensions icon >> 3 dots next to Highlightwizard >> options)")
+        }
         return response.json();
     })
 }

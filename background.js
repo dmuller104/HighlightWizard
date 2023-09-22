@@ -29,6 +29,9 @@ chrome.runtime.onInstalled.addListener( () => {
     { [B_CODE]: { "label":B_LABEL, "data":B_PROMPT} }});
   chrome.storage.sync.set({"popup_options":
     { "height":250, "width":300}});
+  chrome.storage.sync.set({"API_KEY":''});
+
+  chrome.tabs.create({ url: chrome.runtime.getURL("options/options.html") });
   resetContext();
   });
 
@@ -48,6 +51,12 @@ chrome.runtime.onStartup.addListener( () => {
       chrome.storage.sync.set({"popup_options":
         { "height":250, "width":300}});
     }
+    if (!('API_KEY' in syncDat)) {
+      console.log("API_KEY not found, creating empty and will prompt user on next popup");
+      chrome.storage.sync.set({"API_KEY":'SetAPIKey'});
+    }
+
+
   });
   resetContext();
 });

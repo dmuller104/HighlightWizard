@@ -1,3 +1,16 @@
+var keyInput_txt = document.getElementById('apiKeyInput');
+var keySave_btn = document.getElementById('saveApiKey');
+
+chrome.storage.sync.get('API_KEY',(data) => {
+  if (data.API_KEY) {
+    keyInput_txt.value = data.API_KEY;
+  }
+})
+
+keySave_btn.addEventListener('click',() => {
+  chrome.storage.sync.set({"API_KEY":keyInput_txt.value});
+})
+
 /// Text to speech options
 var tts_checkbox = document.getElementById('tts_checkbox');
 
