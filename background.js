@@ -1,3 +1,6 @@
+var B_CODE = '00000000-0000-4000-y000-000000000000';
+var B_LABEL = 'Summarize';
+var B_PROMPT = 'Please summarize: $0';
 
 // Function for reseting context menu (empty and refill)
 function resetContext() {
@@ -16,9 +19,6 @@ function resetContext() {
   });
 }
 
-B_CODE = "00000000-0000-4000-y000-000000000000";
-B_LABEL = "Summarize";
-B_PROMPT = "Please summarize: $0";
 
 // Run on install
 chrome.runtime.onInstalled.addListener( () => {

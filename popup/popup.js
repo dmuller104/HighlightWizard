@@ -3,7 +3,7 @@ API_KEY = '';
 // MODEL = "text-ada-001";
 MODEL = 'text-davinci-003';
 CHAT_MODEL = 'gpt-4';
-CHAT_ROLE = "Your primary objective is to provide very concise summaries, eliminating any superfluous details. The user will give you a text; condense its core meaning into as few words as possible. Make it light and fun"
+CHAT_ROLE = "Your primary objective is to provide very concise summaries, eliminating any superfluous details. The user will give you a text; condense its core meaning into as few words as possible"
 
 messages = [{"role":"system","content":CHAT_ROLE}];
 
@@ -104,14 +104,12 @@ chrome.storage.session.get("contextRequest", (sessiondata) =>{
 
 function appendTextToHistory(text,tag,prior='\n'){
     var userInput = document.createElement("div");
-    
     userInput.className = tag;
 
     var prior_p = document.createElement("p");
     var prior_text_node = document.createTextNode(prior);
     prior_p.appendChild(prior_text_node);
     userInput.appendChild(prior_p);
-    
     var paras = document.createElement("li");
     paras.className = tag + "text" + "list";
 
@@ -120,12 +118,9 @@ function appendTextToHistory(text,tag,prior='\n'){
         var tag_p = document.createElement("p");
         tag_p.className = tag + "text";
         var text_node = document.createTextNode(element);
-    
         tag_p.appendChild(text_node);
-        
-        userInput.appendChild(tag_p);
-        
-        document.getElementById("history").appendChild(userInput);
+            userInput.appendChild(tag_p);
+            document.getElementById("history").appendChild(userInput);
         userInput.scrollIntoView();
     });
 }
