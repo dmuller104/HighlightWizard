@@ -1,6 +1,8 @@
 var B_CODE = '00000000-0000-4000-y000-000000000000';
 var B_LABEL = 'Summarize';
 var B_PROMPT = 'Please summarize: $0';
+var B_SYSTEM = 'Your primary objective is to provide very concise summaries, eliminating any superfluous details. The user will give you a text; condense its core meaning into as few words as possible';
+
 
 // Function for reseting context menu (empty and refill)
 function resetContext() {
@@ -26,7 +28,7 @@ chrome.runtime.onInstalled.addListener( () => {
   // $0 is converted into the highlighted text
   let dat = "Please summarize: $0";
   chrome.storage.sync.set({"context_options":
-    { [B_CODE]: { "label":B_LABEL, "data":B_PROMPT} }});
+    { [B_CODE]: { "label":B_LABEL, "data":B_PROMPT, "system":B_SYSTEM} }});
   chrome.storage.sync.set({"popup_options":
     { "height":250, "width":300}});
   chrome.storage.sync.set({"API_KEY":''});
@@ -45,7 +47,7 @@ chrome.runtime.onStartup.addListener( () => {
     }
     if (!('context_options' in syncDat)) {
       chrome.storage.sync.set({"context_options":
-        { [B_CODE]: { "label":B_LABEL, "data":B_PROMPT } }});
+        { [B_CODE]: { "label":B_LABEL, "data":B_PROMPT, "system":B_SYSTEM } }});
     }
     if (!('popup_options' in syncDat)) {
       chrome.storage.sync.set({"popup_options":

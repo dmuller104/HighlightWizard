@@ -1,4 +1,79 @@
-var API_KEY
+// Globals
+var MODEL = 'text-davinci-003';
+var CHAT_MODEL = 'gpt-4';
+
+function main() {
+    var API_KEY
+    (async () => {
+        API_KEY = await get_key();
+    })();
+
+    // var CHAT_ROLE = "Your primary objective is to provide very concise summaries, eliminating any superfluous details. The user will give you a text; condense its core meaning into as few words as possible"
+
+    var messages = [];
+
+    // Get highlighted text, 
+    chrome.storage.session.get("contextRequest", (sessiondata) =>{
+        var selectedText = sessiondata.contextRequest.selectedText;
+        var id = sessiondata.contextRequest.id;
+        chrome.storage.sync.get(null, (syncdata)=> {
+            var systemPrompt = syncdata.context_options[id].system;
+            messages.push({"role":"system","content":systemPrompt});
+
+            var reg_out = syncdata.context_options[id].data;
+            var prompt = make_prompt(selectedText,reg_out);
+            document.getElementById('selected-text').innerText = prompt;
+            messages.push({"role":"user","content":prompt});
+
+            get_api_chat(messages,API_KEY).then((stuff)=>{
+                messages.push(stuff.choices[0].message)
+                var text = stuff.choices[0].message.content;
+                appendTextToHistory(text,"initcompletion","--")
+                maybeSay(text);
+            });
+        });
+    });
+
+
+    // Event handler for keydown
+    document.addEventListener('keydown', (event) =>{
+        var code = event.code;
+        textarea = document.getElementById("user-textarea");
+        
+        // enter new communication with api
+        if (code === "Enter" && textarea.value.trim().length > 0){
+            if (!event.shiftKey){
+                var text = textarea.value.trim();
+                appendTextToHistory(text,"prompt","----------");
+                textarea.value = "";
+
+                // get response from API
+                messages.push({"role":"user","content":text})
+                get_api_chat(messages,API_KEY).then(stuff=>{
+                    messages.push(stuff.choices[0].message)
+                    var responsetext = stuff.choices[0].message.content;
+                    appendTextToHistory(responsetext,"initcompletion","--")
+                    maybeSay(responsetext);
+                });
+            }
+        }
+        
+        // close if esc key pressed
+        if (code === "Escape"){
+            window.close();
+        }
+
+    });
+
+
+    const tx = document.getElementsByTagName("textarea");
+    for (let i = 0; i < tx.length; i++) {
+    tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
+    tx[i].addEventListener("input", OnInput, false);
+    }
+    
+}
+
 async function get_key() {
     let key = await new Promise((resolve) => {
         chrome.storage.sync.get("API_KEY", (stuff) => {
@@ -15,16 +90,10 @@ async function get_key() {
 
 
 // API_KEY = get_key();
-(async () => {
-    API_KEY = await get_key();
-})();
 // MODEL = "text-babbage-001";
 // MODEL = "text-ada-001";
-MODEL = 'text-davinci-003';
-CHAT_MODEL = 'gpt-4';
-CHAT_ROLE = "Your primary objective is to provide very concise summaries, eliminating any superfluous details. The user will give you a text; condense its core meaning into as few words as possible"
 
-messages = [{"role":"system","content":CHAT_ROLE}];
+// messages = [{"role":"system","content":CHAT_ROLE}];
 
 // get selected text from storage
 
@@ -54,15 +123,17 @@ function count_words(string){
 
 function get_api(prompt) {
     // returns a promise
+    // Globals
+    // 'model': MODEL,
+    // body: '{\n  "model": "text-davinci-003",\n  "prompt": "Say this is a test",\n  "max_tokens": 7,\n  "temperature": 0\n}',
+
     return     fetch('https://api.openai.com/v1/completions', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + API_KEY
         },
-        // body: '{\n  "model": "text-davinci-003",\n  "prompt": "Say this is a test",\n  "max_tokens": 7,\n  "temperature": 0\n}',
         body: JSON.stringify({
-            'model': MODEL,
             'prompt': prompt,
             'max_tokens': 1024,
             'temperature': 0.5
@@ -73,12 +144,14 @@ function get_api(prompt) {
 }
 
 // sends chat to OpenAPI, receives and returns response
-function get_api_chat(messages) {
+function get_api_chat(messages,key) {
+    console.log(messages)
+    console.log(key)
     return fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + API_KEY
+            'Authorization': 'Bearer ' + key
         },
         body: JSON.stringify({
             'model': CHAT_MODEL,
@@ -104,24 +177,6 @@ function make_prompt(text,re_out,re_in=/.*/) {
     });
 }
 
-// Get highlighted text, 
-chrome.storage.session.get("contextRequest", (sessiondata) =>{
-    var selectedText = sessiondata.contextRequest.selectedText;
-    var id = sessiondata.contextRequest.id;
-    chrome.storage.sync.get(null, (syncdata)=> {
-        var reg_out = syncdata.context_options[id].data;
-        var prompt = make_prompt(selectedText,reg_out);
-        document.getElementById('selected-text').innerText = prompt;
-        messages.push({"role":"user","content":prompt});
-
-        get_api_chat(messages).then((stuff)=>{
-            messages.push(stuff.choices[0].message)
-            var text = stuff.choices[0].message.content;
-            appendTextToHistory(text,"initcompletion","--")
-            maybeSay(text);
-        });
-    });
-});
 
 
 function appendTextToHistory(text,tag,prior='\n'){
@@ -147,44 +202,11 @@ function appendTextToHistory(text,tag,prior='\n'){
     });
 }
 
-// Event handler for keydown
-document.addEventListener('keydown', (event) =>{
-    var code = event.code;
-    textarea = document.getElementById("user-textarea");
-    
-    // enter new communication with api
-    if (code === "Enter" && textarea.value.trim().length > 0){
-        if (!event.shiftKey){
-            var text = textarea.value.trim();
-            appendTextToHistory(text,"prompt","----------");
-            textarea.value = "";
 
-            // get response from API
-            messages.push({"role":"user","content":text})
-            get_api_chat(messages).then(stuff=>{
-                messages.push(stuff.choices[0].message)
-                var responsetext = stuff.choices[0].message.content;
-                appendTextToHistory(responsetext,"initcompletion","--")
-                maybeSay(responsetext);
-            });
-        }
-    }
-    
-    // close if esc key pressed
-    if (code === "Escape"){
-        window.close();
-    }
-
-})
-
-
-const tx = document.getElementsByTagName("textarea");
-for (let i = 0; i < tx.length; i++) {
-  tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
-  tx[i].addEventListener("input", OnInput, false);
-}
 
 function OnInput() {
   this.style.height = 0;
   this.style.height = (this.scrollHeight) + "px";
 }
+
+main();
