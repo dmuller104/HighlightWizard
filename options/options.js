@@ -72,7 +72,7 @@ chrome.storage.sync.get("context_options", (data) => {
   for (const [id, value] of Object.entries(data.context_options)) {
     console.log("Loaded: " + id);
     console.log(value);
-    const newOption = createOption(id, value.label, value.data);
+    const newOption = createOption(id, value.label, value.data, value.system);
     optionList.appendChild(newOption);
   }
 });
@@ -86,7 +86,7 @@ addOptionButton.addEventListener("click", () => {
 });
 
 // Function for creating the html options elements along with saving listeners
-function createOption(id,label = "", data = "") {
+function createOption(id,label = "", data = "$0", system = "") {
   const newOption = document.createElement("li");
   newOption.classList.add("option_item");
 
@@ -107,6 +107,14 @@ function createOption(id,label = "", data = "") {
     saveOption(id,newOption);
   });
 
+  // system
+  const systemTextarea = document.createElement("textarea");
+  systemTextarea.classList.add("option_system");
+  systemTextarea.value = system;
+  systemTextarea.addEventListener("input", () => {
+    saveOption(id,newOption);
+  });
+
   // delete button
   const deleteButton = document.createElement("button");
   deleteButton.textContent = "Delete";
@@ -118,6 +126,7 @@ function createOption(id,label = "", data = "") {
 
   newOption.appendChild(labelInput);
   newOption.appendChild(dataTextarea);
+  newOption.appendChild(systemTextarea);
   newOption.appendChild(deleteButton);
 
   return newOption;
@@ -146,13 +155,15 @@ function saveOption(id,option) {
   // Retrieve option ID and label and data from the option element
   const labelElement = option.querySelector(".option_label");
   const dataElement = option.querySelector(".option_data");
+  const systemElement = option.querySelector(".option_system");
   const label = labelElement.value;
   const data = dataElement.value;
+  const system = systemElement.value;
 
   // Save label and data to Chrome sync storage using the option ID as the key
   chrome.storage.sync.get("context_options").then(options_old=>{
     var options = options_old.context_options;
-    options[id] = {label, data};
+    options[id] = {label, data, system};
     chrome.storage.sync.set({"context_options":options});
 
     resetContext();

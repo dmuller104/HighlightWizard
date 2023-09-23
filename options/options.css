@@ -28,6 +28,11 @@ h1 {
   width: 200px;
   resize: none;
 }
+.option_system {
+  height: 60px;
+  width: 200px;
+  resize: none;
+}
 
 
 .delete_button {
