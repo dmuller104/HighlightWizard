@@ -95,23 +95,31 @@ function createOption(id,label = "", data = "$0", system = "") {
   labelInput.type = "text";
   labelInput.classList.add("option_label");
   labelInput.value = label;
-  labelInput.addEventListener("input", () => {
-    saveOption(id,newOption);
-  });
+  // labelInput.addEventListener("input", () => {
+  //   saveOption(id,newOption);
+  // });
 
   // data
   const dataTextarea = document.createElement("textarea");
   dataTextarea.classList.add("option_data");
   dataTextarea.value = data;
-  dataTextarea.addEventListener("input", () => {
-    saveOption(id,newOption);
-  });
+  // dataTextarea.addEventListener("input", () => {
+  //   saveOption(id,newOption);
+  // });
 
   // system
   const systemTextarea = document.createElement("textarea");
   systemTextarea.classList.add("option_system");
   systemTextarea.value = system;
-  systemTextarea.addEventListener("input", () => {
+  // systemTextarea.addEventListener("input", () => {
+  //   saveOption(id,newOption);
+  // });
+
+  // save button
+  const saveButton = document.createElement("button");
+  saveButton.textContent = "Save";
+  saveButton.classList.add("save_button");
+  saveButton.addEventListener("click", () => {
     saveOption(id,newOption);
   });
 
@@ -123,11 +131,18 @@ function createOption(id,label = "", data = "$0", system = "") {
     optionList.removeChild(newOption);
     removeOption(id);
   });
+  
+  const buttonContainer = document.createElement("div");
+  buttonContainer.classList.add("button_container");
+  buttonContainer.appendChild(saveButton);
+  buttonContainer.appendChild(deleteButton);
 
   newOption.appendChild(labelInput);
   newOption.appendChild(dataTextarea);
   newOption.appendChild(systemTextarea);
-  newOption.appendChild(deleteButton);
+  newOption.appendChild(buttonContainer);
+  // newOption.appendChild(saveButton);
+  // newOption.appendChild(deleteButton);
 
   return newOption;
 }

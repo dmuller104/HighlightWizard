@@ -34,9 +34,14 @@ h1 {
   resize: none;
 }
 
-
-.delete_button {
+.button_container {
+  display:flex;
+  flex-direction: column;
   margin-left: 10px;
+}
+
+.delete_button, .save_button {
+  margin-bottom: 10px;
 }
 
 /* Placeholder text */
